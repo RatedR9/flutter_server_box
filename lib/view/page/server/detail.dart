@@ -12,9 +12,6 @@ import 'package:toolbox/data/res/padding.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/view/widget/round_rect_card.dart';
 
-const style11 = TextStyle(fontSize: 11);
-const style13 = TextStyle(fontSize: 13);
-
 class ServerDetailPage extends StatefulWidget {
   const ServerDetailPage(this.id, {Key? key}) : super(key: key);
 
@@ -27,13 +24,13 @@ class ServerDetailPage extends StatefulWidget {
 class _ServerDetailPageState extends State<ServerDetailPage>
     with SingleTickerProviderStateMixin {
   late MediaQueryData _media;
-  late S s;
+  late S _s;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _media = MediaQuery.of(context);
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -172,10 +169,10 @@ class _ServerDetailPageState extends State<ServerDetailPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(ss.sysVer, style: style11, textScaleFactor: 1.0),
+          Text(ss.sysVer, style: size11, textScaleFactor: 1.0),
           Text(
             ss.uptime,
-            style: style11,
+            style: size11,
             textScaleFactor: 1.0,
           ),
         ],
@@ -248,7 +245,7 @@ class _ServerDetailPageState extends State<ServerDetailPage>
         const SizedBox(width: 4),
         Text(
           value,
-          style: style11,
+          style: size11,
           textScaleFactor: 1.0,
           textAlign: TextAlign.center,
         )
@@ -280,10 +277,10 @@ class _ServerDetailPageState extends State<ServerDetailPage>
                     children: [
                       Text(
                         '${disk.usedPercent}% of ${disk.size}',
-                        style: style11,
+                        style: size11,
                         textScaleFactor: 1.0,
                       ),
-                      Text(disk.mountPath, style: style11, textScaleFactor: 1.0)
+                      Text(disk.mountPath, style: size11, textScaleFactor: 1.0)
                     ],
                   ),
                   _buildProgress(disk.usedPercent.toDouble())
@@ -304,7 +301,7 @@ class _ServerDetailPageState extends State<ServerDetailPage>
     if (ns.devices.isEmpty) {
       children.add(Center(
         child: Text(
-          s.noInterface,
+          _s.noInterface,
           style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
       ));
@@ -345,18 +342,18 @@ class _ServerDetailPageState extends State<ServerDetailPage>
         children: [
           SizedBox(
               width: _media.size.width / 4,
-              child: Text(device, style: style11, textScaleFactor: 1.0)),
+              child: Text(device, style: size11, textScaleFactor: 1.0)),
           SizedBox(
             width: _media.size.width / 4,
             child: Text(ns.speedIn(device: device),
-                style: style11,
+                style: size11,
                 textAlign: TextAlign.center,
                 textScaleFactor: 1.0),
           ),
           SizedBox(
               width: _media.size.width / 4,
               child: Text(ns.speedOut(device: device),
-                  style: style11,
+                  style: size11,
                   textAlign: TextAlign.right,
                   textScaleFactor: 1.0))
         ],

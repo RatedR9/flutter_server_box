@@ -22,7 +22,7 @@ class SnippetProvider extends BusyProvider {
 
   void del(Snippet snippet) {
     if (!have(snippet)) return;
-    _snippets.removeAt(index(snippet));
+    _snippets.remove(snippet);
     locator<SnippetStore>().delete(snippet);
     notifyListeners();
   }

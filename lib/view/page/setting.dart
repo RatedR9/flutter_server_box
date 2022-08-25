@@ -27,20 +27,20 @@ class _SettingPageState extends State<SettingPage> {
   late int _selectedColorValue;
   late int _launchPageIdx;
   double _intervalValue = 0;
-  late Color priColor;
+  late Color _priColor;
   static const textStyle = TextStyle(fontSize: 14);
   late final ServerProvider _serverProvider;
   late MediaQueryData _media;
   late ThemeData _theme;
-  late S s;
+  late S _s;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    priColor = primaryColor;
+    _priColor = primaryColor;
     _media = MediaQuery.of(context);
     _theme = Theme.of(context);
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -56,7 +56,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(s.setting, style: size18),
+        title: Text(_s.setting, style: size18),
       ),
       body: ListView(
         padding: const EdgeInsets.all(17),
@@ -75,12 +75,12 @@ class _SettingPageState extends State<SettingPage> {
       String display;
       if (app.newestBuild != null) {
         if (app.newestBuild! > BuildData.build) {
-          display = s.versionHaveUpdate(app.newestBuild!);
+          display = _s.versionHaveUpdate(app.newestBuild!);
         } else {
-          display = s.versionUpdated(BuildData.build);
+          display = _s.versionUpdated(BuildData.build);
         }
       } else {
-        display = s.versionUnknownUpdate(BuildData.build);
+        display = _s.versionUnknownUpdate(BuildData.build);
       }
       return ListTile(
           contentPadding: roundRectCardPadding,
@@ -98,21 +98,21 @@ class _SettingPageState extends State<SettingPage> {
     return ExpansionTile(
       tilePadding: roundRectCardPadding,
       childrenPadding: roundRectCardPadding,
-      textColor: priColor,
+      textColor: _priColor,
       title: Text(
-        s.updateServerStatusInterval,
+        _s.updateServerStatusInterval,
         style: textStyle,
         textAlign: TextAlign.start,
       ),
       subtitle: Text(
-        s.willTakEeffectImmediately,
+        _s.willTakEeffectImmediately,
         style: const TextStyle(color: Colors.grey, fontSize: 13),
       ),
-      trailing: Text('${_intervalValue.toInt()} ${s.second}'),
+      trailing: Text('${_intervalValue.toInt()} ${_s.second}'),
       children: [
         Slider(
-          thumbColor: priColor,
-          activeColor: priColor.withOpacity(0.7),
+          thumbColor: _priColor,
+          activeColor: _priColor.withOpacity(0.7),
           min: 0,
           max: 10,
           value: _intervalValue,
@@ -125,7 +125,7 @@ class _SettingPageState extends State<SettingPage> {
             _store.serverStatusUpdateInterval.put(val.toInt());
             _serverProvider.startAutoRefresh();
           },
-          label: '${_intervalValue.toInt()} ${s.second}',
+          label: '${_intervalValue.toInt()} ${_s.second}',
           divisions: 10,
         ),
         const SizedBox(
@@ -133,7 +133,7 @@ class _SettingPageState extends State<SettingPage> {
         ),
         _intervalValue == 0.0
             ? Text(
-                s.updateIntervalEqual0,
+                _s.updateIntervalEqual0,
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
                 textAlign: TextAlign.center,
               )
@@ -147,22 +147,22 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildAppColorPreview() {
     return ExpansionTile(
-        textColor: priColor,
+        textColor: _priColor,
         tilePadding: roundRectCardPadding,
         childrenPadding: roundRectCardPadding,
         trailing: ClipOval(
           child: Container(
-            color: priColor,
+            color: _priColor,
             height: 27,
             width: 27,
           ),
         ),
         title: Text(
-          s.appPrimaryColor,
+          _s.appPrimaryColor,
           style: textStyle,
         ),
         children: [
-          _buildAppColorPicker(priColor),
+          _buildAppColorPicker(_priColor),
           _buildColorPickerConfirmBtn()
         ]);
   }
@@ -188,11 +188,11 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildLaunchPage() {
     return ExpansionTile(
-      textColor: priColor,
+      textColor: _priColor,
       tilePadding: roundRectCardPadding,
       childrenPadding: roundRectCardPadding,
       title: Text(
-        s.launchPage,
+        _s.launchPage,
         style: textStyle,
       ),
       trailing: ConstrainedBox(

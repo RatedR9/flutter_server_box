@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
                         borderSide: BorderSide(color: primaryColor))),
                 radioTheme: RadioThemeData(
                     fillColor: getMaterialStateColor(primaryColor))),
-            home: MyHomePage(primaryColor: primaryColor),
+            home: const MyHomePage(),
           );
         });
   }

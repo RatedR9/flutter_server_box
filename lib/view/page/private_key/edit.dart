@@ -8,7 +8,7 @@ import 'package:toolbox/data/provider/private_key.dart';
 import 'package:toolbox/data/res/font_style.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/locator.dart';
-import 'package:toolbox/view/widget/input_decoration.dart';
+import 'package:toolbox/view/widget/input.dart';
 
 class PrivateKeyEditPage extends StatefulWidget {
   const PrivateKeyEditPage({Key? key, this.info}) : super(key: key);
@@ -21,40 +21,39 @@ class PrivateKeyEditPage extends StatefulWidget {
 
 class _PrivateKeyEditPageState extends State<PrivateKeyEditPage>
     with AfterLayoutMixin {
-  final nameController = TextEditingController();
-  final keyController = TextEditingController();
-  final pwdController = TextEditingController();
-  final nameNode = FocusNode();
-  final keyNode = FocusNode();
-  final pwdNode = FocusNode();
+  final _nameController = TextEditingController();
+  final _keyController = TextEditingController();
+  final _pwdController = TextEditingController();
+  final _nameNode = FocusNode();
+  final _keyNode = FocusNode();
+  final _pwdNode = FocusNode();
 
-  late FocusScopeNode focusScope;
+  late FocusScopeNode _focusScope;
 
   late PrivateKeyProvider _provider;
-  late Widget loading;
-  late S s;
+  var _loading = const SizedBox();
+  late S _s;
 
   @override
   void initState() {
     super.initState();
     _provider = locator<PrivateKeyProvider>();
-    loading = const SizedBox();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    s = S.of(context);
-    focusScope = FocusScope.of(context);
+    _s = S.of(context);
+    _focusScope = FocusScope.of(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(s.edit, style: size18), actions: [
+      appBar: AppBar(title: Text(_s.edit, style: size18), actions: [
         widget.info != null
             ? IconButton(
-                tooltip: s.delete,
+                tooltip: _s.delete,
                 onPressed: () {
                   _provider.delInfo(widget.info!);
                   Navigator.of(context).pop();
@@ -66,48 +65,48 @@ class _PrivateKeyEditPageState extends State<PrivateKeyEditPage>
         padding: const EdgeInsets.all(13),
         children: [
           TextField(
-            controller: nameController,
+            controller: _nameController,
             keyboardType: TextInputType.text,
-            focusNode: nameNode,
-            onSubmitted: (_) => focusScope.requestFocus(keyNode),
-            decoration: buildDecoration(s.name, icon: Icons.info),
+            focusNode: _nameNode,
+            onSubmitted: (_) => _focusScope.requestFocus(_keyNode),
+            decoration: buildDecoration(_s.name, icon: Icons.info),
           ),
           TextField(
-            controller: keyController,
+            controller: _keyController,
             autocorrect: false,
             minLines: 3,
             maxLines: 10,
             keyboardType: TextInputType.text,
-            focusNode: keyNode,
-            onSubmitted: (_) => focusScope.requestFocus(pwdNode),
+            focusNode: _keyNode,
+            onSubmitted: (_) => _focusScope.requestFocus(_pwdNode),
             enableSuggestions: false,
-            decoration: buildDecoration(s.privateKey, icon: Icons.vpn_key),
+            decoration: buildDecoration(_s.privateKey, icon: Icons.vpn_key),
           ),
           TextField(
-            controller: pwdController,
+            controller: _pwdController,
             autocorrect: false,
             keyboardType: TextInputType.text,
-            focusNode: pwdNode,
+            focusNode: _pwdNode,
             obscureText: true,
-            decoration: buildDecoration(s.pwd, icon: Icons.password),
+            decoration: buildDecoration(_s.pwd, icon: Icons.password),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-          loading
+          _loading
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: s.save,
+        tooltip: _s.save,
         onPressed: () async {
-          final name = nameController.text;
-          final key = keyController.text;
-          final pwd = pwdController.text;
+          final name = _nameController.text;
+          final key = _keyController.text;
+          final pwd = _pwdController.text;
           if (name.isEmpty || key.isEmpty) {
-            showSnackBar(context, Text(s.fieldMustNotEmpty));
+            showSnackBar(context, Text(_s.fieldMustNotEmpty));
             return;
           }
           FocusScope.of(context).unfocus();
           setState(() {
-            loading = const SizedBox(
+            _loading = const SizedBox(
               height: 50,
               child: Center(
                 child: CircularProgressIndicator(),
@@ -123,7 +122,7 @@ class _PrivateKeyEditPageState extends State<PrivateKeyEditPage>
             haveErr = true;
           } finally {
             setState(() {
-              loading = const SizedBox();
+              _loading = const SizedBox();
             });
           }
           if (haveErr) return;
@@ -142,9 +141,9 @@ class _PrivateKeyEditPageState extends State<PrivateKeyEditPage>
   @override
   void afterFirstLayout(BuildContext context) {
     if (widget.info != null) {
-      nameController.text = widget.info!.id;
-      keyController.text = widget.info!.privateKey;
-      pwdController.text = widget.info!.password;
+      _nameController.text = widget.info!.id;
+      _keyController.text = widget.info!.privateKey;
+      _pwdController.text = widget.info!.password;
     }
   }
 }

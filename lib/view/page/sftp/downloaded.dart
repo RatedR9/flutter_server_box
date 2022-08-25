@@ -23,7 +23,7 @@ class SFTPDownloadedPage extends StatefulWidget {
 class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
   PathWithPrefix? _path;
   String? _prefixPath;
-  late S s;
+  late S _s;
   late ThemeData _theme;
 
   @override
@@ -39,7 +39,7 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    s = S.of(context);
+    _s = S.of(context);
     _theme = Theme.of(context);
   }
 
@@ -47,7 +47,7 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(s.download),
+        title: Text(_s.download),
         actions: [
           IconButton(
             icon: const Icon(Icons.downloading),
@@ -68,7 +68,7 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           if (_path!.path == _prefixPath) {
-            showSnackBar(context, Text(s.alreadyLastDir));
+            showSnackBar(context, Text(_s.alreadyLastDir));
             return;
           }
           _path!.update('..');
@@ -88,7 +88,7 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Divider(),
-          (_path?.path ?? s.loadingFiles).omitStartStr(
+          (_path?.path ?? _s.loadingFiles).omitStartStr(
             style: TextStyle(
                 color: color.isBrightColor ? Colors.black : Colors.white),
           )
@@ -142,34 +142,34 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
     final fileName = file.path.split('/').last;
     showRoundDialog(
         context,
-        s.choose,
+        _s.choose,
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.delete),
-              title: Text(s.delete),
+              title: Text(_s.delete),
               onTap: () {
                 Navigator.of(context).pop();
                 showRoundDialog(
-                    context, s.sureDelete(fileName), const SizedBox(), [
+                    context, _s.sureDelete(fileName), const SizedBox(), [
                   TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(s.cancel)),
+                      child: Text(_s.cancel)),
                   TextButton(
                     onPressed: () {
                       file.deleteSync();
                       setState(() {});
                       Navigator.of(context).pop();
                     },
-                    child: Text(s.ok),
+                    child: Text(_s.ok),
                   ),
                 ]);
               },
             ),
             ListTile(
                 leading: const Icon(Icons.open_in_new),
-                title: Text(s.open),
+                title: Text(_s.open),
                 onTap: () {
                   shareFiles(context, [file.absolute.path]);
                 }),
@@ -178,7 +178,7 @@ class _SFTPDownloadedPageState extends State<SFTPDownloadedPage> {
         [
           TextButton(
               onPressed: (() => Navigator.of(context).pop()),
-              child: Text(s.close))
+              child: Text(_s.close))
         ]);
   }
 }

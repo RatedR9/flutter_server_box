@@ -4,13 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:toolbox/core/persistant_store.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/view/widget/card_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:toolbox/core/extension/stringx.dart';
-
-void unawaited(Future<void> future) {}
 
 bool isDarkMode(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark;
@@ -55,21 +52,6 @@ Future<T?>? showRoundDialog<T>(
           padding: padding,
         );
       });
-}
-
-Widget buildSwitch(BuildContext context, StoreProperty<bool> prop,
-    {Function(bool)? func}) {
-  return ValueListenableBuilder(
-    valueListenable: prop.listenable(),
-    builder: (context, bool value, widget) {
-      return Switch(
-          value: value,
-          onChanged: (value) {
-            if (func != null) func(value);
-            prop.put(value);
-          });
-    },
-  );
 }
 
 void setTransparentNavigationBar(BuildContext context) {

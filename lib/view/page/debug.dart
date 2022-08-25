@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:toolbox/data/provider/debug.dart';
 
-class DebugPage extends StatefulWidget {
+class DebugPage extends StatelessWidget {
   const DebugPage({Key? key}) : super(key: key);
 
-  @override
-  _DebugPageState createState() => _DebugPageState();
-}
-
-class _DebugPageState extends State<DebugPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

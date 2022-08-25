@@ -4,9 +4,10 @@ import 'package:toolbox/core/utils.dart';
 import 'package:toolbox/data/model/server/ping_result.dart';
 import 'package:toolbox/data/provider/server.dart';
 import 'package:toolbox/data/res/color.dart';
+import 'package:toolbox/data/res/font_style.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/locator.dart';
-import 'package:toolbox/view/widget/input_field.dart';
+import 'package:toolbox/view/widget/input.dart';
 import 'package:toolbox/view/widget/round_rect_card.dart';
 
 class PingPage extends StatefulWidget {
@@ -22,10 +23,7 @@ class _PingPageState extends State<PingPage>
   late MediaQueryData _media;
   final List<PingResult> _results = [];
   final _serverProvider = locator<ServerProvider>();
-  late S s;
-  static const summaryTextStyle = TextStyle(
-    fontSize: 12,
-  );
+  late S _s;
 
   @override
   void initState() {
@@ -37,7 +35,7 @@ class _PingPageState extends State<PingPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _media = MediaQuery.of(context);
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -70,8 +68,8 @@ class _PingPageState extends State<PingPage>
   }
 
   Widget _buildResultItem(PingResult result) {
-    final unknown = s.unknown;
-    final ms = s.ms;
+    final unknown = _s.unknown;
+    final ms = _s.ms;
     return RoundRectCard(ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 7, horizontal: 17),
       title: Text(result.serverName,
@@ -79,10 +77,10 @@ class _PingPageState extends State<PingPage>
               fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)),
       subtitle: Text(
         _buildPingSummary(result, unknown, ms),
-        style: summaryTextStyle,
+        style: size11,
       ),
       trailing: Text(
-          '${s.pingAvg}${result.statistic?.avg?.toStringAsFixed(2) ?? s.unknown} $ms',
+          '${_s.pingAvg}${result.statistic?.avg?.toStringAsFixed(2) ?? _s.unknown} $ms',
           style: TextStyle(fontSize: 14, color: primaryColor)),
     ));
   }
@@ -90,25 +88,25 @@ class _PingPageState extends State<PingPage>
   String _buildPingSummary(PingResult result, String unknown, String ms) {
     final ip = result.ip ?? unknown;
     if (result.results == null || result.results!.isEmpty) {
-      return '$ip - ${s.noResult}';
+      return '$ip - ${_s.noResult}';
     }
     final ttl = result.results?.first.ttl ?? unknown;
     final loss = result.statistic?.loss ?? unknown;
     final min = result.statistic?.min ?? unknown;
     final max = result.statistic?.max ?? unknown;
-    return '$ip\n${s.ttl}: $ttl, ${s.loss}: $loss%\n${s.min}: $min $ms, ${s.max}: $max $ms';
+    return '$ip\n${_s.ttl}: $ttl, ${_s.loss}: $loss%\n${_s.min}: $min $ms, ${_s.max}: $max $ms';
   }
 
   Future<void> doPing() async {
     _results.clear();
     final target = _textEditingController.text.trim();
     if (target.isEmpty) {
-      showSnackBar(context, Text(s.pingInputIP));
+      showSnackBar(context, Text(_s.pingInputIP));
       return;
     }
 
     if (_serverProvider.servers.isEmpty) {
-      showSnackBar(context, Text(s.pingNoServer));
+      showSnackBar(context, Text(_s.pingNoServer));
       return;
     }
 
@@ -140,7 +138,7 @@ class _PingPageState extends State<PingPage>
                     const SizedBox(
                       width: 7,
                     ),
-                    Text(s.clear)
+                    Text(_s.clear)
                   ],
                 ),
                 onPressed: () {
@@ -157,7 +155,7 @@ class _PingPageState extends State<PingPage>
                     const SizedBox(
                       width: 7,
                     ),
-                    Text(s.start)
+                    Text(_s.start)
                   ],
                 ),
                 onPressed: () {

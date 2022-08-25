@@ -40,7 +40,7 @@ class _ServerPageState extends State<ServerPage>
   late RefreshController _refreshController;
 
   late ServerProvider _serverProvider;
-  late S s;
+  late S _s;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _ServerPageState extends State<ServerPage>
     _media = MediaQuery.of(context);
     _theme = Theme.of(context);
     _primaryColor = primaryColor;
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -67,7 +67,7 @@ class _ServerPageState extends State<ServerPage>
       if (pro.servers.isEmpty) {
         return Center(
           child: Text(
-            s.serverTabEmpty,
+            _s.serverTabEmpty,
             textAlign: TextAlign.center,
           ),
         );
@@ -102,7 +102,7 @@ class _ServerPageState extends State<ServerPage>
         onPressed: () =>
             AppRoute(const ServerEditPage(), 'Add server info page')
                 .go(context),
-        tooltip: s.addAServer,
+        tooltip: _s.addAServer,
         heroTag: 'server page fab',
         child: const Icon(Icons.add),
       ),
@@ -169,8 +169,8 @@ class _ServerPageState extends State<ServerPage>
                   hasError
                       ? GestureDetector(
                           onTap: () => showRoundDialog(
-                              context, s.error, Text(ss.failedInfo ?? ''), []),
-                          child: Text(s.clickSee, style: style))
+                              context, _s.error, Text(ss.failedInfo ?? ''), []),
+                          child: Text(_s.clickSee, style: style))
                       : Text(topRightStr, style: style, textScaleFactor: 1.0),
                   _buildMoreBtn(spi),
                 ],
@@ -292,11 +292,11 @@ class _ServerPageState extends State<ServerPage>
       String? failedInfo) {
     switch (cs) {
       case ServerConnectionState.disconnected:
-        return s.disconnected;
+        return _s.disconnected;
       case ServerConnectionState.connected:
         if (temp == '') {
           if (upTime == '') {
-            return s.serverTabLoading;
+            return _s.serverTabLoading;
           } else {
             return upTime;
           }
@@ -308,17 +308,17 @@ class _ServerPageState extends State<ServerPage>
           }
         }
       case ServerConnectionState.connecting:
-        return s.serverTabConnecting;
+        return _s.serverTabConnecting;
       case ServerConnectionState.failed:
         if (failedInfo == null) {
-          return s.serverTabFailed;
+          return _s.serverTabFailed;
         }
         if (failedInfo.contains('encypted')) {
-          return s.serverTabPlzSave;
+          return _s.serverTabPlzSave;
         }
         return failedInfo;
       default:
-        return s.serverTabUnkown;
+        return _s.serverTabUnkown;
     }
   }
 

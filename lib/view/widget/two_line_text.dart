@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toolbox/data/res/font_style.dart';
 
 class TwoLineText extends StatelessWidget {
   const TwoLineText({Key? key, required this.up, required this.down})
@@ -16,7 +17,7 @@ class TwoLineText extends StatelessWidget {
         ),
         Text(
           down,
-          style: const TextStyle(fontSize: 11),
+          style: size11,
         )
       ],
     );

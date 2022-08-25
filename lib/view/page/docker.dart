@@ -7,6 +7,7 @@ import 'package:toolbox/data/model/docker/ps.dart';
 import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/data/provider/docker.dart';
 import 'package:toolbox/data/provider/server.dart';
+import 'package:toolbox/data/res/font_style.dart';
 import 'package:toolbox/data/res/url.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/locator.dart';
@@ -25,8 +26,7 @@ class DockerManagePage extends StatefulWidget {
 
 class _DockerManagePageState extends State<DockerManagePage> {
   final _docker = locator<DockerProvider>();
-  final greyTextStyle = const TextStyle(color: Colors.grey);
-  late S s;
+  late S _s;
 
   @override
   void dispose() {
@@ -37,7 +37,7 @@ class _DockerManagePageState extends State<DockerManagePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -48,7 +48,7 @@ class _DockerManagePageState extends State<DockerManagePage> {
         .firstWhere((element) => element.info == widget.spi)
         .client;
     if (client == null) {
-      showSnackBar(context, Text(s.noClient));
+      showSnackBar(context, Text(_s.noClient));
       Navigator.of(context).pop();
       return;
     }
@@ -98,7 +98,7 @@ class _DockerManagePageState extends State<DockerManagePage> {
         padding: const EdgeInsets.all(7),
         children: [
           _buildVersion(
-              docker.edition ?? s.unknown, docker.version ?? s.unknown),
+              docker.edition ?? _s.unknown, docker.version ?? _s.unknown),
           _buildPsItems(running, docker)
         ].map((e) => RoundRectCard(e)).toList(),
       );
@@ -109,18 +109,18 @@ class _DockerManagePageState extends State<DockerManagePage> {
     switch (err) {
       case 'docker not found':
         return UrlText(
-          text: s.installDockerWithUrl,
-          replace: s.install,
+          text: _s.installDockerWithUrl,
+          replace: _s.install,
         );
       case 'no client':
-        return Text(s.waitConnection);
+        return Text(_s.waitConnection);
       case 'invalid version':
         return UrlText(
-          text: s.invalidVersionHelp(issueUrl),
+          text: _s.invalidVersionHelp(issueUrl),
           replace: 'Github',
         );
       default:
-        return Text(s.unknownError);
+        return Text(_s.unknownError);
     }
   }
 
@@ -136,8 +136,8 @@ class _DockerManagePageState extends State<DockerManagePage> {
 
   Widget _buildPsItems(List<DockerPsItem> running, DockerProvider docker) {
     return ExpansionTile(
-      title: Text(s.containerStatus),
-      subtitle: Text(_buildSubtitle(running), style: greyTextStyle),
+      title: Text(_s.containerStatus),
+      subtitle: Text(_buildSubtitle(running), style: grey),
       children: running.map((item) {
         return ListTile(
           title: Text(item.image),
@@ -202,8 +202,8 @@ class _DockerManagePageState extends State<DockerManagePage> {
     final runningCount = running.where((element) => element.running).length;
     final stoped = running.length - runningCount;
     if (stoped == 0) {
-      return s.dockerStatusRunningFmt(runningCount);
+      return _s.dockerStatusRunningFmt(runningCount);
     }
-    return s.dockerStatusRunningAndStoppedFmt(runningCount, stoped);
+    return _s.dockerStatusRunningAndStoppedFmt(runningCount, stoped);
   }
 }

@@ -58,3 +58,7 @@ List<ServerPrivateInfo> getServerInfoList(dynamic data) {
 
   return ss;
 }
+
+extension ServerPrivateInfoExtension on ServerPrivateInfo {
+  String get id => '$user@$ip:$port';
+}

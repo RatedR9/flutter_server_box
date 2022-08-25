@@ -35,13 +35,13 @@ class _SFTPPageState extends State<SFTPPage> {
   final ScrollController _scrollController = ScrollController();
 
   late MediaQueryData _media;
-  late S s;
+  late S _s;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _media = MediaQuery.of(context);
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -61,24 +61,24 @@ class _SFTPPageState extends State<SFTPPage> {
             IconButton(
               onPressed: (() => showRoundDialog(
                       context,
-                      s.choose,
+                      _s.choose,
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
                               leading: const Icon(Icons.folder),
-                              title: Text(s.createFolder),
+                              title: Text(_s.createFolder),
                               onTap: () => mkdir(context)),
                           ListTile(
                               leading: const Icon(Icons.insert_drive_file),
-                              title: Text(s.createFile),
+                              title: Text(_s.createFile),
                               onTap: () => newFile(context)),
                         ],
                       ),
                       [
                         TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: Text(s.close))
+                            child: Text(_s.close))
                       ])),
               icon: const Icon(Icons.add),
             )
@@ -164,24 +164,24 @@ class _SFTPPageState extends State<SFTPPage> {
   void onItemPress(BuildContext context, SftpName file, bool showDownload) {
     showRoundDialog(
         context,
-        s.choose,
+        _s.choose,
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.delete),
-              title: Text(s.delete),
+              title: Text(_s.delete),
               onTap: () => delete(context, file),
             ),
             ListTile(
               leading: const Icon(Icons.edit),
-              title: Text(s.rename),
+              title: Text(_s.rename),
               onTap: () => rename(context, file),
             ),
             showDownload
                 ? ListTile(
                     leading: const Icon(Icons.download),
-                    title: Text(s.download),
+                    title: Text(_s.download),
                     onTap: () => download(context, file),
                   )
                 : const SizedBox()
@@ -190,15 +190,15 @@ class _SFTPPageState extends State<SFTPPage> {
         [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.cancel))
+              child: Text(_s.cancel))
         ]);
   }
 
   void download(BuildContext context, SftpName name) {
-    showRoundDialog(context, s.download,
-        Text('${s.dl2Local(name.filename)}\n${s.keepForeground}'), [
+    showRoundDialog(context, _s.download,
+        Text('${_s.dl2Local(name.filename)}\n${_s.keepForeground}'), [
       TextButton(
-          onPressed: () => Navigator.of(context).pop(), child: Text(s.cancel)),
+          onPressed: () => Navigator.of(context).pop(), child: Text(_s.cancel)),
       TextButton(
           onPressed: () async {
             Navigator.of(context).pop();
@@ -213,26 +213,26 @@ class _SFTPPageState extends State<SFTPPage> {
                     ? null
                     : locator<PrivateKeyStore>().get(pubKeyId).privateKey);
             Navigator.of(context).pop();
-            showRoundDialog(context, s.goSftpDlPage, const SizedBox(), [
+            showRoundDialog(context, _s.goSftpDlPage, const SizedBox(), [
               TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(s.cancel)),
+                  child: Text(_s.cancel)),
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     AppRoute(const SFTPDownloadingPage(), 'sftp downloading')
                         .go(context);
                   },
-                  child: Text(s.ok))
+                  child: Text(_s.ok))
             ]);
           },
-          child: Text(s.download))
+          child: Text(_s.download))
     ]);
   }
 
   void delete(BuildContext context, SftpName file) {
     Navigator.of(context).pop();
-    showRoundDialog(context, s.attention, Text(s.sureDelete(file.filename)), [
+    showRoundDialog(context, _s.attention, Text(_s.sureDelete(file.filename)), [
       TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel')),
@@ -243,7 +243,7 @@ class _SFTPPageState extends State<SFTPPage> {
             listDir();
           },
           child: Text(
-            s.delete,
+            _s.delete,
             style: const TextStyle(color: Colors.red),
           )),
     ]);
@@ -254,25 +254,25 @@ class _SFTPPageState extends State<SFTPPage> {
     final textController = TextEditingController();
     showRoundDialog(
         context,
-        s.createFolder,
+        _s.createFolder,
         TextField(
           controller: textController,
           decoration: InputDecoration(
-            labelText: s.name,
+            labelText: _s.name,
           ),
         ),
         [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.cancel)),
+              child: Text(_s.cancel)),
           TextButton(
               onPressed: () {
                 if (textController.text == '') {
                   showRoundDialog(
-                      context, s.attention, Text(s.fieldMustNotEmpty), [
+                      context, _s.attention, Text(_s.fieldMustNotEmpty), [
                     TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text(s.ok)),
+                        child: Text(_s.ok)),
                   ]);
                   return;
                 }
@@ -282,7 +282,7 @@ class _SFTPPageState extends State<SFTPPage> {
                 listDir();
               },
               child: Text(
-                s.ok,
+                _s.ok,
                 style: const TextStyle(color: Colors.red),
               )),
         ]);
@@ -293,25 +293,25 @@ class _SFTPPageState extends State<SFTPPage> {
     final textController = TextEditingController();
     showRoundDialog(
         context,
-        s.createFile,
+        _s.createFile,
         TextField(
           controller: textController,
           decoration: InputDecoration(
-            labelText: s.name,
+            labelText: _s.name,
           ),
         ),
         [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.cancel)),
+              child: Text(_s.cancel)),
           TextButton(
               onPressed: () async {
                 if (textController.text == '') {
                   showRoundDialog(
-                      context, s.attention, Text(s.fieldMustNotEmpty), [
+                      context, _s.attention, Text(_s.fieldMustNotEmpty), [
                     TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text(s.ok)),
+                        child: Text(_s.ok)),
                   ]);
                   return;
                 }
@@ -322,7 +322,7 @@ class _SFTPPageState extends State<SFTPPage> {
                 listDir();
               },
               child: Text(
-                s.ok,
+                _s.ok,
                 style: const TextStyle(color: Colors.red),
               )),
         ]);
@@ -333,25 +333,25 @@ class _SFTPPageState extends State<SFTPPage> {
     final textController = TextEditingController();
     showRoundDialog(
         context,
-        s.rename,
+        _s.rename,
         TextField(
           controller: textController,
           decoration: InputDecoration(
-            labelText: s.name,
+            labelText: _s.name,
           ),
         ),
         [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.cancel)),
+              child: Text(_s.cancel)),
           TextButton(
               onPressed: () async {
                 if (textController.text == '') {
                   showRoundDialog(
-                      context, s.attention, Text(s.fieldMustNotEmpty), [
+                      context, _s.attention, Text(_s.fieldMustNotEmpty), [
                     TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text(s.ok)),
+                        child: Text(_s.ok)),
                   ]);
                   return;
                 }
@@ -361,7 +361,7 @@ class _SFTPPageState extends State<SFTPPage> {
                 listDir();
               },
               child: Text(
-                s.rename,
+                _s.rename,
                 style: const TextStyle(color: Colors.red),
               )),
         ]);
@@ -388,9 +388,9 @@ class _SFTPPageState extends State<SFTPPage> {
         });
       }
     } catch (e) {
-      await showRoundDialog(context, s.error, Text(e.toString()), [
+      await showRoundDialog(context, _s.error, Text(e.toString()), [
         TextButton(
-            onPressed: () => Navigator.of(context).pop(), child: Text(s.ok))
+            onPressed: () => Navigator.of(context).pop(), child: Text(_s.ok))
       ]);
       if (_status.path!.undo()) {
         await listDir();
@@ -401,7 +401,7 @@ class _SFTPPageState extends State<SFTPPage> {
   Widget _buildDestSelector() {
     final str = _status.path?.path;
     return ExpansionTile(
-        title: Text(_status.spi?.name ?? s.chooseDestination),
+        title: Text(_status.spi?.name ?? _s.chooseDestination),
         subtitle: _status.selected
             ? str!.omitStartStr(style: const TextStyle(color: Colors.grey))
             : null,

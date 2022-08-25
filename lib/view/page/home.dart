@@ -31,8 +31,7 @@ import 'package:toolbox/view/page/snippet/list.dart';
 import 'package:toolbox/view/widget/url_text.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.primaryColor}) : super(key: key);
-  final Color primaryColor;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -49,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage>
   late final AdvancedDrawerController _advancedDrawerController;
   late int _selectIndex;
   late double _width;
-  late S s;
+  late S _s;
 
   @override
   void initState() {
@@ -64,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    s = S.of(context);
+    _s = S.of(context);
     _width = MediaQuery.of(context).size.width;
   }
 
@@ -125,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage>
             actions: [
               IconButton(
                 icon: const Icon(Icons.developer_mode, size: 23),
-                tooltip: s.debug,
+                tooltip: _s.debug,
                 onPressed: () =>
                     AppRoute(const DebugPage(), 'Debug Page').go(context),
               ),
@@ -224,50 +223,50 @@ class _MyHomePageState extends State<MyHomePage>
               children: [
                 ListTile(
                   leading: const Icon(Icons.settings),
-                  title: Text(s.setting),
+                  title: Text(_s.setting),
                   onTap: () =>
                       AppRoute(const SettingPage(), 'Setting').go(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.vpn_key),
-                  title: Text(s.privateKey),
+                  title: Text(_s.privateKey),
                   onTap: () => AppRoute(
                           const StoredPrivateKeysPage(), 'private key list')
                       .go(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.download),
-                  title: Text(s.download),
+                  title: Text(_s.download),
                   onTap: () =>
                       AppRoute(const SFTPDownloadedPage(), 'snippet list')
                           .go(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.import_export),
-                  title: Text(s.backup),
+                  title: Text(_s.backup),
                   onTap: () =>
                       AppRoute(BackupPage(), 'backup page').go(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.info),
-                  title: Text(s.feedback),
+                  title: Text(_s.feedback),
                   onTap: () => showRoundDialog(
-                      context, s.feedback, Text(s.feedbackOnGithub), [
+                      context, _s.feedback, Text(_s.feedbackOnGithub), [
                     TextButton(
                         onPressed: () => Clipboard.setData(
                             const ClipboardData(text: issueUrl)),
-                        child: Text(s.copy)),
+                        child: Text(_s.copy)),
                     TextButton(
                         onPressed: () => openUrl(issueUrl),
-                        child: Text(s.feedback)),
+                        child: Text(_s.feedback)),
                     TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text(s.close))
+                        child: Text(_s.close))
                   ]),
                 ),
                 ListTile(
                   leading: const Icon(Icons.snippet_folder),
-                  title: Text(s.snippet),
+                  title: Text(_s.snippet),
                   onTap: () => AppRoute(const SnippetListPage(), 'snippet list')
                       .go(context),
                 ),
@@ -278,9 +277,10 @@ class _MyHomePageState extends State<MyHomePage>
                   applicationIcon: _buildIcon(),
                   aboutBoxChildren: [
                     UrlText(
-                        text: s.madeWithLove(myGithub), replace: 'LollipopKit'),
+                        text: _s.madeWithLove(myGithub),
+                        replace: 'LollipopKit'),
                     UrlText(
-                      text: s.aboutThanks,
+                      text: _s.aboutThanks,
                     ),
                     const UrlText(
                       text: rainSunMeGithub,
@@ -291,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage>
                       replace: 'fecture',
                     )
                   ],
-                  child: Text(s.license),
+                  child: Text(_s.license),
                 )
               ],
             ),

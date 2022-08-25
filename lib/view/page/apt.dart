@@ -6,6 +6,7 @@ import 'package:toolbox/data/model/apt/upgrade_pkg_info.dart';
 import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/data/provider/apt.dart';
 import 'package:toolbox/data/provider/server.dart';
+import 'package:toolbox/data/res/font_style.dart';
 import 'package:toolbox/data/res/url.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/locator.dart';
@@ -26,18 +27,17 @@ class AptManagePage extends StatefulWidget {
 class _AptManagePageState extends State<AptManagePage>
     with SingleTickerProviderStateMixin {
   late MediaQueryData _media;
-  final greyStyle = const TextStyle(color: Colors.grey);
-  final scrollController = ScrollController();
-  final scrollControllerUpdate = ScrollController();
-  final textController = TextEditingController();
+  final _scrollController = ScrollController();
+  final _scrollControllerUpdate = ScrollController();
+  final _textController = TextEditingController();
   final _aptProvider = locator<AptProvider>();
-  late S s;
+  late S _s;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _media = MediaQuery.of(context);
-    s = S.of(context);
+    _s = S.of(context);
   }
 
   @override
@@ -53,17 +53,17 @@ class _AptManagePageState extends State<AptManagePage>
         .servers
         .firstWhere((e) => e.info == widget.spi);
     if (si.client == null) {
-      showSnackBar(context, Text(s.waitConnection));
+      showSnackBar(context, Text(_s.waitConnection));
       Navigator.of(context).pop();
       return;
     }
 
     // ignore: prefer_function_declarations_over_variables
     Function onSubmitted = () {
-      if (textController.text == '') {
-        showRoundDialog(context, s.attention, Text(s.fieldMustNotEmpty), [
+      if (_textController.text == '') {
+        showRoundDialog(context, _s.attention, Text(_s.fieldMustNotEmpty), [
           TextButton(
-              onPressed: () => Navigator.of(context).pop(), child: Text(s.ok)),
+              onPressed: () => Navigator.of(context).pop(), child: Text(_s.ok)),
         ]);
         return;
       }
@@ -75,14 +75,14 @@ class _AptManagePageState extends State<AptManagePage>
       if (!mounted) return '';
       await showRoundDialog(
           context,
-          triedTimes == 3 ? s.lastTry : (user ?? s.unknown),
+          triedTimes == 3 ? _s.lastTry : (user ?? _s.unknown),
           TextField(
-            controller: textController,
+            controller: _textController,
             keyboardType: TextInputType.visiblePassword,
             obscureText: true,
             onSubmitted: (_) => onSubmitted(),
             decoration: InputDecoration(
-              labelText: s.pwd,
+              labelText: _s.pwd,
             ),
           ),
           [
@@ -91,24 +91,24 @@ class _AptManagePageState extends State<AptManagePage>
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
-                child: Text(s.cancel)),
+                child: Text(_s.cancel)),
             TextButton(
                 onPressed: () => onSubmitted(),
                 child: Text(
-                  s.ok,
+                  _s.ok,
                   style: const TextStyle(color: Colors.red),
                 )),
           ]);
-      return textController.text.trim();
+      return _textController.text.trim();
     };
 
     _aptProvider.init(
         si.client!,
         si.status.sysVer.dist,
-        () =>
-            scrollController.jumpTo(scrollController.position.maxScrollExtent),
-        () => scrollControllerUpdate
-            .jumpTo(scrollControllerUpdate.positions.last.maxScrollExtent),
+        () => _scrollController
+            .jumpTo(_scrollController.position.maxScrollExtent),
+        () => _scrollControllerUpdate
+            .jumpTo(_scrollControllerUpdate.positions.last.maxScrollExtent),
         onPwdRequest);
     _aptProvider.refreshInstalled();
   }
@@ -162,7 +162,7 @@ class _AptManagePageState extends State<AptManagePage>
                 constraints: const BoxConstraints.expand(),
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(18),
-                  controller: scrollControllerUpdate,
+                  controller: _scrollControllerUpdate,
                   child: Text(apt.updateLog!),
                 ),
               ));
@@ -174,7 +174,7 @@ class _AptManagePageState extends State<AptManagePage>
               padding: const EdgeInsets.all(17),
               child: UrlText(
                 text:
-                    '${s.experimentalFeature}\n${s.reportBugsOnGithubIssue(issueUrl)}',
+                    '${_s.experimentalFeature}\n${_s.reportBugsOnGithubIssue(issueUrl)}',
                 replace: 'Github Issue',
                 textAlign: TextAlign.center,
               ),
@@ -190,7 +190,7 @@ class _AptManagePageState extends State<AptManagePage>
     if (apt.upgradeable!.isEmpty) {
       return ListTile(
         title: Text(
-          s.noUpdateAvailable,
+          _s.noUpdateAvailable,
           textAlign: TextAlign.center,
         ),
         subtitle: const Text('>_<', textAlign: TextAlign.center),
@@ -200,24 +200,24 @@ class _AptManagePageState extends State<AptManagePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ExpansionTile(
-          title: Text(s.foundNUpdate(apt.upgradeable!.length)),
+          title: Text(_s.foundNUpdate(apt.upgradeable!.length)),
           subtitle: Text(
             apt.upgradeable!.map((e) => e.package).join(', '),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: greyStyle,
+            style: grey,
           ),
           children: apt.upgradeLog == null
               ? [
                   TextButton(
-                      child: Text(s.updateAll),
+                      child: Text(_s.updateAll),
                       onPressed: () {
                         apt.upgrade();
                       }),
                   SizedBox(
                     height: _media.size.height * 0.73,
                     child: ListView(
-                        controller: scrollController,
+                        controller: _scrollController,
                         children: apt.upgradeable!
                             .map((e) => _buildUpdateItem(e, apt))
                             .toList()),
@@ -230,7 +230,7 @@ class _AptManagePageState extends State<AptManagePage>
                         constraints: const BoxConstraints.expand(),
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.all(18),
-                          controller: scrollController,
+                          controller: _scrollController,
                           child: Text(apt.upgradeLog!),
                         ),
                       ))
@@ -245,7 +245,7 @@ class _AptManagePageState extends State<AptManagePage>
       title: Text(info.package),
       subtitle: Text(
         '${info.nowVersion} -> ${info.newVersion}',
-        style: greyStyle,
+        style: grey,
       ),
     );
   }
