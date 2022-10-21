@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:dartssh2/dartssh2.dart';
 import 'package:easy_isolate/easy_isolate.dart';
+import 'package:toolbox/core/utils.dart';
 import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/data/model/sftp/download_status.dart';
 
@@ -17,12 +17,11 @@ class DownloadItem {
 
 class SftpDownloadWorker {
   SftpDownloadWorker(
-      {required this.onNotify, required this.item, this.privateKey});
+      {required this.onNotify, required this.item});
 
   final Function(Object event) onNotify;
   final DownloadItem item;
   final worker = Worker();
-  final String? privateKey;
 
   void dispose() {
     worker.dispose();
@@ -37,7 +36,7 @@ class SftpDownloadWorker {
       isolateMessageHandler,
       errorHandler: print,
     );
-    worker.sendMessage(DownloadItemEvent(item, privateKey));
+    worker.sendMessage(DownloadItemEvent(item));
   }
 
   /// Handle the messages coming from the isolate
@@ -54,15 +53,10 @@ class SftpDownloadWorker {
         final watch = Stopwatch()..start();
         final item = data.item;
         final spi = item.spi;
-        final socket = await SSHSocket.connect(spi.ip, spi.port);
-        SSHClient client;
-        if (spi.pubKeyId == null) {
-          client = SSHClient(socket,
-              username: spi.user, onPasswordRequest: () => spi.pwd);
-        } else {
-          client = SSHClient(socket,
-              username: spi.user,
-              identities: SSHKeyPair.fromPem(data.privateKey!));
+        final client = await createSSHClient(spi);
+        if (client == null) {
+          mainSendPort.send(SftpWorkerStatus.failed);
+          return;
         }
         mainSendPort.send(SftpWorkerStatus.sshConnectted);
 
@@ -103,8 +97,7 @@ class SftpDownloadWorker {
 }
 
 class DownloadItemEvent {
-  DownloadItemEvent(this.item, this.privateKey);
+  DownloadItemEvent(this.item);
 
   final DownloadItem item;
-  final String? privateKey;
 }

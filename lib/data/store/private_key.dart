@@ -15,9 +15,13 @@ class PrivateKeyStore extends PersistentStore {
         json.decode(box.get('key', defaultValue: '[]')!));
   }
 
-  PrivateKeyInfo get(String id) {
+  PrivateKeyInfo? get(String id) {
     final ss = fetch();
-    return ss.firstWhere((e) => e.id == id);
+    try {
+      return ss.firstWhere((s) => s.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
   void delete(PrivateKeyInfo s) {

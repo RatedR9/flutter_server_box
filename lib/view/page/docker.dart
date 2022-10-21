@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:after_layout/after_layout.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +9,6 @@ import 'package:toolbox/data/model/app/menu_item.dart';
 import 'package:toolbox/data/model/docker/ps.dart';
 import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/data/provider/docker.dart';
-import 'package:toolbox/data/provider/server.dart';
 import 'package:toolbox/data/res/font_style.dart';
 import 'package:toolbox/data/res/url.dart';
 import 'package:toolbox/generated/l10n.dart';
@@ -24,7 +26,8 @@ class DockerManagePage extends StatefulWidget {
   State<DockerManagePage> createState() => _DockerManagePageState();
 }
 
-class _DockerManagePageState extends State<DockerManagePage> {
+class _DockerManagePageState extends State<DockerManagePage>
+    with AfterLayoutMixin {
   final _docker = locator<DockerProvider>();
   late S _s;
 
@@ -38,21 +41,6 @@ class _DockerManagePageState extends State<DockerManagePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _s = S.of(context);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final client = locator<ServerProvider>()
-        .servers
-        .firstWhere((element) => element.info == widget.spi)
-        .client;
-    if (client == null) {
-      showSnackBar(context, Text(_s.noClient));
-      Navigator.of(context).pop();
-      return;
-    }
-    _docker.init(client, widget.spi.user);
   }
 
   @override
@@ -205,5 +193,16 @@ class _DockerManagePageState extends State<DockerManagePage> {
       return _s.dockerStatusRunningFmt(runningCount);
     }
     return _s.dockerStatusRunningAndStoppedFmt(runningCount, stoped);
+  }
+
+  @override
+  Future<void> afterFirstLayout(BuildContext context) async {
+    final client = await createSSHClient(widget.spi);
+    if (client == null) {
+      showSnackBar(context, Text(_s.noClient));
+      Navigator.of(context).pop();
+      return;
+    }
+    _docker.init(client, widget.spi.user);
   }
 }

@@ -7,6 +7,7 @@ import 'package:toolbox/data/model/server/server.dart';
 import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/data/model/server/server_status.dart';
 import 'package:toolbox/data/model/server/server_worker.dart';
+import 'package:toolbox/data/model/server/snippet.dart';
 import 'package:toolbox/data/store/private_key.dart';
 import 'package:toolbox/data/store/server.dart';
 import 'package:toolbox/data/store/setting.dart';
@@ -109,6 +110,26 @@ class ServerProvider extends BusyProvider {
     }
 
     _workers[spiId]?.update();
+  }
+
+  Future<String?> runSnippet(ServerPrivateInfo spi, Snippet snippet) async {
+    final spiId = spi.id;
+    if (!_workers.containsKey(spiId)) {
+      final keyId = spi.pubKeyId;
+      final privateKey =
+          keyId == null ? null : locator<PrivateKeyStore>().get(keyId);
+      _workers[spiId] = ServerWorker(
+          onNotify: (event) => onNotify(event, spiId),
+          spi: spi,
+          privateKey: privateKey?.privateKey);
+      _workers[spiId]?.init();
+    }
+
+    final result = await _workers[spiId]?.runSnippet(snippet);
+    if (result != null) {
+      _snippetResults[spiId] = result;
+    }
+    return result;
   }
 
   void onNotify(dynamic event, String id) {

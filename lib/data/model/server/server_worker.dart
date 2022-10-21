@@ -79,6 +79,10 @@ class ServerWorker {
     worker.sendMessage(ServerWorkerRequest.update);
   }
 
+  void run(Snippet snippet) {
+    worker.sendMessage(snippet);
+  }
+
   /// Handle the messages coming from the isolate
   void mainMessageHandler(dynamic data, SendPort isolateSendPort) {
     onNotify(data);

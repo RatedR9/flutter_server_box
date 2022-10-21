@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:after_layout/after_layout.dart';
+import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:toolbox/core/extension/stringx.dart';
@@ -25,13 +29,14 @@ class AptManagePage extends StatefulWidget {
 }
 
 class _AptManagePageState extends State<AptManagePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AfterLayoutMixin {
   late MediaQueryData _media;
   final _scrollController = ScrollController();
   final _scrollControllerUpdate = ScrollController();
   final _textController = TextEditingController();
   final _aptProvider = locator<AptProvider>();
   late S _s;
+  SSHClient? client;
 
   @override
   void didChangeDependencies() {
@@ -44,73 +49,6 @@ class _AptManagePageState extends State<AptManagePage>
   void dispose() {
     super.dispose();
     locator<AptProvider>().clear();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final si = locator<ServerProvider>()
-        .servers
-        .firstWhere((e) => e.info == widget.spi);
-    if (si.client == null) {
-      showSnackBar(context, Text(_s.waitConnection));
-      Navigator.of(context).pop();
-      return;
-    }
-
-    // ignore: prefer_function_declarations_over_variables
-    Function onSubmitted = () {
-      if (_textController.text == '') {
-        showRoundDialog(context, _s.attention, Text(_s.fieldMustNotEmpty), [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(), child: Text(_s.ok)),
-        ]);
-        return;
-      }
-      Navigator.of(context).pop();
-    };
-
-    // ignore: prefer_function_declarations_over_variables
-    PwdRequestFunc onPwdRequest = (triedTimes, user) async {
-      if (!mounted) return '';
-      await showRoundDialog(
-          context,
-          triedTimes == 3 ? _s.lastTry : (user ?? _s.unknown),
-          TextField(
-            controller: _textController,
-            keyboardType: TextInputType.visiblePassword,
-            obscureText: true,
-            onSubmitted: (_) => onSubmitted(),
-            decoration: InputDecoration(
-              labelText: _s.pwd,
-            ),
-          ),
-          [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: Text(_s.cancel)),
-            TextButton(
-                onPressed: () => onSubmitted(),
-                child: Text(
-                  _s.ok,
-                  style: const TextStyle(color: Colors.red),
-                )),
-          ]);
-      return _textController.text.trim();
-    };
-
-    _aptProvider.init(
-        si.client!,
-        si.status.sysVer.dist,
-        () => _scrollController
-            .jumpTo(_scrollController.position.maxScrollExtent),
-        () => _scrollControllerUpdate
-            .jumpTo(_scrollControllerUpdate.positions.last.maxScrollExtent),
-        onPwdRequest);
-    _aptProvider.refreshInstalled();
   }
 
   @override
@@ -248,5 +186,71 @@ class _AptManagePageState extends State<AptManagePage>
         style: grey,
       ),
     );
+  }
+
+  @override
+  Future<void> afterFirstLayout(BuildContext context) async {
+    final si = locator<ServerProvider>()
+        .servers
+        .firstWhere((element) => element.info == widget.spi);
+
+    // ignore: prefer_function_declarations_over_variables
+    Function onSubmitted = () {
+      if (_textController.text == '') {
+        showRoundDialog(context, _s.attention, Text(_s.fieldMustNotEmpty), [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(), child: Text(_s.ok)),
+        ]);
+        return;
+      }
+      Navigator.of(context).pop();
+    };
+
+    // ignore: prefer_function_declarations_over_variables
+    PwdRequestFunc onPwdRequest = (triedTimes, user) async {
+      if (!mounted) return '';
+      await showRoundDialog(
+          context,
+          triedTimes == 3 ? _s.lastTry : (user ?? _s.unknown),
+          TextField(
+            controller: _textController,
+            keyboardType: TextInputType.visiblePassword,
+            obscureText: true,
+            onSubmitted: (_) => onSubmitted(),
+            decoration: InputDecoration(
+              labelText: _s.pwd,
+            ),
+          ),
+          [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: Text(_s.cancel)),
+            TextButton(
+                onPressed: () => onSubmitted(),
+                child: Text(
+                  _s.ok,
+                  style: const TextStyle(color: Colors.red),
+                )),
+          ]);
+      return _textController.text.trim();
+    };
+    client = await createSSHClient(widget.spi);
+    if (client == null) {
+      showSnackBar(context, Text(_s.noClient));
+      Navigator.of(context).pop();
+      return;
+    }
+    _aptProvider.init(
+        client!,
+        si.status.sysVer.dist,
+        () => _scrollController
+            .jumpTo(_scrollController.position.maxScrollExtent),
+        () => _scrollControllerUpdate
+            .jumpTo(_scrollControllerUpdate.positions.last.maxScrollExtent),
+        onPwdRequest);
+    _aptProvider.refreshInstalled();
   }
 }

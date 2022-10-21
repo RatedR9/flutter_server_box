@@ -18,7 +18,7 @@ class SftpDownloadStatus {
   SftpDownloadStatus(this.item, this.notifyListeners, {String? key})
       : id = DateTime.now().microsecondsSinceEpoch {
     worker =
-        SftpDownloadWorker(onNotify: onNotify, item: item, privateKey: key);
+        SftpDownloadWorker(onNotify: onNotify, item: item);
     worker.init();
   }
 
@@ -55,4 +55,4 @@ class SftpDownloadStatus {
   }
 }
 
-enum SftpWorkerStatus { preparing, sshConnectted, downloading, finished }
+enum SftpWorkerStatus { preparing, sshConnectted, downloading, finished, failed }

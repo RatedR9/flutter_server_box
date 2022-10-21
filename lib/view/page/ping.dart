@@ -111,10 +111,11 @@ class _PingPageState extends State<PingPage>
     }
 
     await Future.wait(_serverProvider.servers.map((e) async {
-      if (e.client == null) {
+      final client = await createSSHClient(e.info);
+      if (client == null) {
         return;
       }
-      final result = await e.client!.run('ping -c 3 $target').string;
+      final result = await client.run('ping -c 3 $target').string;
       _results.add(PingResult.parse(e.info.name, result));
       setState(() {});
     }));

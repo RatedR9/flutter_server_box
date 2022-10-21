@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:after_layout/after_layout.dart';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
 import 'package:toolbox/core/extension/numx.dart';
@@ -14,7 +16,6 @@ import 'package:toolbox/data/model/sftp/browser_status.dart';
 import 'package:toolbox/data/provider/server.dart';
 import 'package:toolbox/data/provider/sftp_download.dart';
 import 'package:toolbox/data/res/path.dart';
-import 'package:toolbox/data/store/private_key.dart';
 import 'package:toolbox/generated/l10n.dart';
 import 'package:toolbox/locator.dart';
 import 'package:toolbox/view/page/sftp/downloading.dart';
@@ -29,7 +30,7 @@ class SFTPPage extends StatefulWidget {
   _SFTPPageState createState() => _SFTPPageState();
 }
 
-class _SFTPPageState extends State<SFTPPage> {
+class _SFTPPageState extends State<SFTPPage> with AfterLayoutMixin {
   final SftpBrowserStatus _status = SftpBrowserStatus();
 
   final ScrollController _scrollController = ScrollController();
@@ -109,15 +110,15 @@ class _SFTPPageState extends State<SFTPPage> {
     final spi = _status.spi;
     final si =
         locator<ServerProvider>().servers.firstWhere((s) => s.info == spi);
-    final client = si.client;
-    if (client == null ||
+
+    if (_status.client == null ||
         si.connectionState != ServerConnectionState.connected) {
       return centerCircleLoading;
     }
 
     if (_status.files == null) {
       _status.path = AbsolutePath('/');
-      listDir(path: '/', client: client);
+      listDir(path: '/');
       return centerCircleLoading;
     } else {
       return RefreshIndicator(
@@ -206,12 +207,8 @@ class _SFTPPageState extends State<SFTPPage> {
             final remotePath =
                 prePath + (prePath.endsWith('/') ? '' : '/') + name.filename;
             final local = '${(await sftpDownloadDir).path}$remotePath';
-            final pubKeyId = _status.spi!.pubKeyId;
             locator<SftpDownloadProvider>().add(
-                DownloadItem(_status.spi!, remotePath, local),
-                key: pubKeyId == null
-                    ? null
-                    : locator<PrivateKeyStore>().get(pubKeyId).privateKey);
+                DownloadItem(_status.spi!, remotePath, local));
             Navigator.of(context).pop();
             showRoundDialog(context, _s.goSftpDlPage, const SizedBox(), [
               TextButton(
@@ -367,14 +364,14 @@ class _SFTPPageState extends State<SFTPPage> {
         ]);
   }
 
-  Future<void> listDir({String? path, SSHClient? client}) async {
+  Future<void> listDir({String? path}) async {
     if (_status.isBusy) {
       return;
     }
     _status.isBusy = true;
-    if (client != null) {
-      final sftpc = await client.sftp();
-      _status.client = sftpc;
+    if (_status.client == null) {
+      showSnackBar(context, Text(_s.noClient));
+      return;
     }
     try {
       final fs =
@@ -419,13 +416,28 @@ class _SFTPPageState extends State<SFTPPage> {
         _status.spi = spi;
         _status.selected = true;
         _status.path = AbsolutePath('/');
-        listDir(
-            client: locator<ServerProvider>()
-                .servers
-                .firstWhere((s) => s.info == spi)
-                .client,
-            path: '/');
+        listDir(path: '/');
       },
     );
+  }
+
+  Future<void> connect({ServerPrivateInfo? spi}) async {
+    final s = () {
+      if (spi != null) {
+        return spi;
+      }
+      return widget.spi;
+    }();
+    final client = await createSSHClient(s);
+    if (client == null) {
+      showSnackBar(context, Text(_s.noClient));
+      return;
+    }
+    _status.client = await client.sftp();
+  }
+
+  @override
+  FutureOr<void> afterFirstLayout(BuildContext context) async {
+    await connect();
   }
 }

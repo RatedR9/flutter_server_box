@@ -43,10 +43,10 @@
 		<false/>
 		<key>CFBundleLocalizations</key>
 		<array>
-		    <string>en</string>
-		    <string>zh</string>
+			<string>en</string>
+			<string>zh</string>
 		</array>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-</dict>
+		<true/>
+	</dict>
 </plist>

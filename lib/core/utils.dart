@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:toolbox/data/model/server/server_private_info.dart';
 import 'package:toolbox/generated/l10n.dart';
+import 'package:toolbox/locator.dart';
 import 'package:toolbox/view/widget/card_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:toolbox/core/extension/stringx.dart';
+
+import '../data/store/private_key.dart';
 
 bool isDarkMode(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark;
@@ -91,4 +96,23 @@ Future<bool> shareFiles(BuildContext context, List<String> filePaths) async {
   }
   await Share.shareFiles(filePaths, text: 'ServerBox -> $text');
   return filePaths.isNotEmpty;
+}
+
+Future<SSHClient?> createSSHClient(ServerPrivateInfo spi) async {
+  final socket = await SSHSocket.connect(spi.ip, spi.port);
+  SSHClient? client;
+
+  if (spi.pubKeyId == null) {
+    client =
+        SSHClient(socket, username: spi.user, onPasswordRequest: () => spi.pwd);
+  } else {
+    final privateKey = locator<PrivateKeyStore>().get(spi.pubKeyId!);
+    if (privateKey == null) {
+      return null;
+    }
+    client = SSHClient(socket,
+        username: spi.user,
+        identities: SSHKeyPair.fromPem(privateKey.privateKey));
+  }
+  return client;
 }
