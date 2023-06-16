@@ -20,4 +20,8 @@ jobs:
         run: flutter build ios --release --no-codesign
       - name: Archive app
         run: flutter build ios --release --no-codesign --build-number=$GITHUB_RUN_NUMBER --build-name=$GITHUB_SHA
-
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Runner
+          path: build/ios/ipa/Runner.ipa
