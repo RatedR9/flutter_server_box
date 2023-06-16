@@ -2,7 +2,7 @@ name: Build IPA
 on:
   push:
     branches:
-      - main
+      - test
 jobs:
   build:
     runs-on: macos-latest
