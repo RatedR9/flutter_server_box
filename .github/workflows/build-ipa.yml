@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Create IPA Directory
-        run: mkdir -p build/ios
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -26,4 +24,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Runner
-          path: build/ios/ipa/Runner.ipa
+          path: Runner.ipa
